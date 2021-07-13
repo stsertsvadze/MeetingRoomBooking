@@ -24,8 +24,13 @@ public class MeetingRoomService {
         return meetingRoomRepository.findById(roomNumber);
     }
 
-    public void deleteMeetingRoom(int roomNumber) {
-        meetingRoomRepository.deleteById(roomNumber);
+    public boolean deleteMeetingRoom(int roomNumber) {
+        try {
+            meetingRoomRepository.deleteById(roomNumber);
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
     }
 
 }

@@ -1,6 +1,6 @@
 package ge.stsertsvadze.meetingroombooking.service;
 
-import ge.stsertsvadze.meetingroombooking.model.dto.MeetingRequest;
+import ge.stsertsvadze.meetingroombooking.model.dto.request.MeetingDto;
 import ge.stsertsvadze.meetingroombooking.model.entity.Invitation;
 import ge.stsertsvadze.meetingroombooking.model.entity.Meeting;
 import ge.stsertsvadze.meetingroombooking.model.entity.MeetingRoom;
@@ -26,9 +26,9 @@ public class MeetingService {
         this.meetingRoomRepository = meetingRoomRepository;
     }
 
-    public Optional<Meeting> addMeeting(MeetingRequest meetingRequest) {
-        String username = meetingRequest.getAuthor();
-        int roomNumber = meetingRequest.getRoomNumber();
+    public Optional<Meeting> addMeeting(MeetingDto meetingDto) {
+        String username = meetingDto.getAuthor();
+        int roomNumber = meetingDto.getRoomNumber();
 
         Optional<User> author = userRepository.findByUsername(username);
         Optional<MeetingRoom> meetingRoom = meetingRoomRepository.findByRoomNumber(roomNumber);
@@ -45,9 +45,9 @@ public class MeetingService {
         } else {
             return Optional.empty();
         }
-        meeting.setStartTime(meetingRequest.getStartTime());
-        meeting.setDuration(meetingRequest.getDuration());
-        List<Invitation> invitations = createInvitations(meetingRequest.getInvitations(), meeting);
+        meeting.setStartTime(meetingDto.getStartTime());
+        meeting.setDuration(meetingDto.getDuration());
+        List<Invitation> invitations = createInvitations(meetingDto.getInvitations(), meeting);
         meeting.setInvitations(invitations);
         meetingRepository.save(meeting);
         return Optional.of(meeting);
@@ -72,8 +72,13 @@ public class MeetingService {
         return invitations;
     }
 
-    public void deleteMeeting(Long meetingId) {
-        meetingRepository.deleteById(meetingId);
+    public boolean deleteMeeting(Long meetingId) {
+        try {
+            meetingRepository.deleteById(meetingId);
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
     }
 
     public Optional<Meeting> getMeeting(Long meetingId) {

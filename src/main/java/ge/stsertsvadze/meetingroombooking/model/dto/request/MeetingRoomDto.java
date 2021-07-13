@@ -1,11 +1,11 @@
-package ge.stsertsvadze.meetingroombooking.model.dto;
+package ge.stsertsvadze.meetingroombooking.model.dto.request;
 
-public class MeetingRoomRequest {
+public class MeetingRoomDto {
 
     private int roomNumber;
     private int capacity;
 
-    public MeetingRoomRequest(int roomNumber, int capacity) {
+    public MeetingRoomDto(int roomNumber, int capacity) {
         this.roomNumber = roomNumber;
         this.capacity = capacity;
     }

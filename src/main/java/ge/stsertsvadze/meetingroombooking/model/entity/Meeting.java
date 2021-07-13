@@ -1,14 +1,10 @@
 package ge.stsertsvadze.meetingroombooking.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import ge.stsertsvadze.meetingroombooking.model.dto.MeetingRequest;
-import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
 
 import java.util.List;
-
-import static org.hibernate.annotations.CascadeType.*;
 
 @Entity
 @Table

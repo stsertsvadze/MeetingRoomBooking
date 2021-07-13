@@ -1,4 +1,4 @@
-package ge.stsertsvadze.meetingroombooking.model.dto;
+package ge.stsertsvadze.meetingroombooking.model.dto.request;
 
 import ge.stsertsvadze.meetingroombooking.model.entity.Invitation;
 import ge.stsertsvadze.meetingroombooking.model.entity.MeetingRoom;
@@ -6,16 +6,16 @@ import ge.stsertsvadze.meetingroombooking.model.entity.User;
 
 import java.util.List;
 
-public class MeetingRequest {
+public class MeetingDto {
     private Long startTime;
     private Long duration;
     private int roomNumber;
     private String author;
     private List<String> invitations;
 
-    public MeetingRequest() {}
+    public MeetingDto() {}
 
-    public MeetingRequest(Long startTime, Long duration, int roomNumber, String author, List<String> invitations) {
+    public MeetingDto(Long startTime, Long duration, int roomNumber, String author, List<String> invitations) {
         this.startTime = startTime;
         this.duration = duration;
         this.roomNumber = roomNumber;

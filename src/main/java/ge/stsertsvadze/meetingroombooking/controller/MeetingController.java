@@ -1,10 +1,13 @@
 package ge.stsertsvadze.meetingroombooking.controller;
 
 import ge.stsertsvadze.meetingroombooking.model.dto.*;
-import ge.stsertsvadze.meetingroombooking.model.entity.Invitation;
+import ge.stsertsvadze.meetingroombooking.model.dto.request.DeleteMeetingDto;
+import ge.stsertsvadze.meetingroombooking.model.dto.request.MeetingDto;
+import ge.stsertsvadze.meetingroombooking.model.dto.request.Request;
+import ge.stsertsvadze.meetingroombooking.model.dto.response.Response;
+import ge.stsertsvadze.meetingroombooking.model.dto.response.ResponseFailure;
+import ge.stsertsvadze.meetingroombooking.model.dto.response.ResponseSuccess;
 import ge.stsertsvadze.meetingroombooking.model.entity.Meeting;
-import ge.stsertsvadze.meetingroombooking.model.entity.MeetingRoom;
-import ge.stsertsvadze.meetingroombooking.model.entity.User;
 import ge.stsertsvadze.meetingroombooking.service.MeetingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -23,30 +26,36 @@ public class MeetingController {
         this.meetingService = meetingService;
     }
 
-    @PostMapping()
-    public Response addMeeting(@RequestBody MeetingRequest meetingRequest) {
-        Optional<Meeting> meeting = meetingService.addMeeting(meetingRequest);
-        if (meeting.isPresent()) {
-            return new MeetingResponseSuccess(meeting.get());
-        } else {
-            List<ErrorMessage> errors = Collections.singletonList(new ErrorMessage("invalid_meeting"));
-            return new ResponseFailure(errors);
-        }
-    }
-
-    @DeleteMapping
-    public void deleteMeeting(@RequestParam Long meetingId) {
-        meetingService.deleteMeeting(meetingId);
-    }
-
     @GetMapping
     public Response getMeeting(@RequestParam Long meetingId) {
         Optional<Meeting> meeting = meetingService.getMeeting(meetingId);
         if (meeting.isPresent()) {
-            return new MeetingResponseSuccess(meeting.get());
+            return new ResponseSuccess<>(meeting.get());
         } else {
             List<ErrorMessage> errors = Collections.singletonList(new ErrorMessage("invalid_meeting_id"));
-            return new ResponseFailure(errors);
+            return new ResponseFailure<>(errors);
+        }
+    }
+
+    @PostMapping()
+    public Response addMeeting(@RequestBody Request<MeetingDto> request) {
+        Optional<Meeting> meeting = meetingService.addMeeting(request.getData());
+        if (meeting.isPresent()) {
+            return new ResponseSuccess<>(meeting.get());
+        } else {
+            List<ErrorMessage> errors = Collections.singletonList(new ErrorMessage("invalid_meeting"));
+            return new ResponseFailure<>(errors);
+        }
+    }
+
+    @DeleteMapping
+    public Response deleteMeeting(@RequestParam Request<DeleteMeetingDto> request) {
+        boolean success = meetingService.deleteMeeting(request.getData().getMeetingId());
+        if (success) {
+            return new ResponseSuccess<>("meeting_deleted");
+        } else {
+            List<ErrorMessage> errors = Collections.singletonList(new ErrorMessage("invalid_meeting"));
+            return new ResponseFailure<>(errors);
         }
     }
 }

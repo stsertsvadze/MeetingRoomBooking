@@ -1,7 +1,7 @@
 package ge.stsertsvadze.meetingroombooking.service;
 
-import ge.stsertsvadze.meetingroombooking.model.dto.AnswerInvitationRequest;
-import ge.stsertsvadze.meetingroombooking.model.dto.InvitationListRequest;
+import ge.stsertsvadze.meetingroombooking.model.dto.request.AnswerInvitationDto;
+import ge.stsertsvadze.meetingroombooking.model.dto.request.InvitationListDto;
 import ge.stsertsvadze.meetingroombooking.model.entity.Invitation;
 import ge.stsertsvadze.meetingroombooking.model.entity.Meeting;
 import ge.stsertsvadze.meetingroombooking.model.entity.User;
@@ -26,13 +26,14 @@ public class InvitationService {
         this.userRepository = userRepository;
     }
 
-    public void saveInvitations(InvitationListRequest invitationListRequest) {
-        Long meetingId = invitationListRequest.getMeetingId();
+    public Optional<Meeting> saveInvitations(InvitationListDto invitationListDto) {
+        Long meetingId = invitationListDto.getMeetingId();
         Optional<Meeting> meeting = meetingRepository.findById(meetingId);
         if (meeting.isPresent()) {
-            addInvitations(meeting.get(), invitationListRequest.getInvitations());
+            addInvitations(meeting.get(), invitationListDto.getInvitations());
             meetingRepository.save(meeting.get());
         }
+        return meeting;
     }
 
     private void addInvitations(Meeting meeting, List<String> usernames) {
@@ -57,11 +58,16 @@ public class InvitationService {
         return meeting.map(Meeting::getInvitations);
     }
 
-    public void deleteInvitation(Long invitationId) {
-        invitationRepository.deleteById(invitationId);
+    public boolean deleteInvitation(Long invitationId) {
+        try {
+            invitationRepository.deleteById(invitationId);
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
     }
 
-    public void answerInvitation(AnswerInvitationRequest request) {
+    public Optional<Invitation> answerInvitation(AnswerInvitationDto request) {
         Long invitationId = request.getInvitationId();
         Invitation.Status choice = request.isAccept() ? Invitation.Status.ACCEPTED : Invitation.Status.DECLINED;
         Optional<Invitation> invitation = invitationRepository.findById(invitationId);
@@ -69,6 +75,7 @@ public class InvitationService {
             invitation.get().setStatus(choice);
             invitationRepository.save(invitation.get());
         }
+        return invitation;
     }
 
 }

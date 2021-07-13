@@ -7,11 +7,11 @@ public class ErrorMessage {
         this.keyword = keyword;
     }
 
-    public String getKeywords() {
+    public String getKeyword() {
         return keyword;
     }
 
-    public void setKeywords(String keyword) {
+    public void setKeyword(String keyword) {
         this.keyword = keyword;
     }
 }

@@ -1,12 +1,12 @@
-package ge.stsertsvadze.meetingroombooking.model.dto;
+package ge.stsertsvadze.meetingroombooking.model.dto.request;
 
-public class AnswerInvitationRequest {
+public class AnswerInvitationDto {
     private Long invitationId;
     private boolean accept;
 
-    public AnswerInvitationRequest() {}
+    public AnswerInvitationDto() {}
 
-    public AnswerInvitationRequest(Long invitationId, boolean accept) {
+    public AnswerInvitationDto(Long invitationId, boolean accept) {
         this.invitationId = invitationId;
         this.accept = accept;
     }

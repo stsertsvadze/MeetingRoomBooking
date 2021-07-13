@@ -1,6 +1,10 @@
 package ge.stsertsvadze.meetingroombooking.controller;
 
 import ge.stsertsvadze.meetingroombooking.model.dto.*;
+import ge.stsertsvadze.meetingroombooking.model.dto.request.Request;
+import ge.stsertsvadze.meetingroombooking.model.dto.response.Response;
+import ge.stsertsvadze.meetingroombooking.model.dto.response.ResponseFailure;
+import ge.stsertsvadze.meetingroombooking.model.dto.response.ResponseSuccess;
 import ge.stsertsvadze.meetingroombooking.model.entity.User;
 import ge.stsertsvadze.meetingroombooking.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,26 +24,26 @@ public class UserController {
     }
 
     @PostMapping("/user")
-    public Response registerUser(@RequestBody UserRequest userRequest) {
-        User user = userRequest.getData();
+    public Response registerUser(@RequestBody Request<User> request) {
+        User user = request.getData();
         if (userService.userExists(user.getUsername())) {
             List<ErrorMessage> errors = Collections.singletonList(new ErrorMessage("username_taken"));
-            return new ResponseFailure(errors);
+            return new ResponseFailure<>(errors);
         } else {
             userService.addUser(user);
-            return new UserResponseSuccess(user);
+            return new ResponseSuccess<>(user);
         }
     }
 
     @PostMapping("/session")
-    public Response login(@RequestBody UserRequest userRequest) {
-        User user = userRequest.getData();
+    public Response login(@RequestBody Request<User> request) {
+        User user = request.getData();
         Optional<User> result = userService.getUserByCredentials(user);
         if (result.isPresent()) {
-            return new UserResponseSuccess(result.get());
+            return new ResponseSuccess<>(result.get());
         } else {
             List<ErrorMessage> errors = Collections.singletonList(new ErrorMessage("wrong_credentials"));
-            return new ResponseFailure(errors);
+            return new ResponseFailure<>(errors);
         }
     }
 }

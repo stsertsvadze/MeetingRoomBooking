@@ -1,14 +1,14 @@
-package ge.stsertsvadze.meetingroombooking.model.dto;
+package ge.stsertsvadze.meetingroombooking.model.dto.request;
 
 import java.util.List;
 
-public class InvitationListRequest {
+public class InvitationListDto {
     private Long meetingId;
     private List<String> invitations;
 
-    public InvitationListRequest() {}
+    public InvitationListDto() {}
 
-    public InvitationListRequest(Long meetingId, List<String> invitations) {
+    public InvitationListDto(Long meetingId, List<String> invitations) {
         this.meetingId = meetingId;
         this.invitations = invitations;
     }

@@ -1,11 +1,11 @@
-package ge.stsertsvadze.meetingroombooking.model.dto;
+package ge.stsertsvadze.meetingroombooking.model.dto.request;
 
-public class DeleteInvitationRequest {
+public class DeleteInvitationDto {
     Long invitationId;
 
-    public DeleteInvitationRequest() {}
+    public DeleteInvitationDto() {}
 
-    public DeleteInvitationRequest(Long invitationId) {
+    public DeleteInvitationDto(Long invitationId) {
         this.invitationId = invitationId;
     }
 
