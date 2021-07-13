@@ -1,9 +1,12 @@
 package ge.stsertsvadze.meetingroombooking.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import ge.stsertsvadze.meetingroombooking.model.dto.MeetingRequest;
 import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
+
+import java.util.List;
 
 import static org.hibernate.annotations.CascadeType.*;
 
@@ -15,7 +18,6 @@ public class Meeting {
     @SequenceGenerator(name = "meeting_seq", sequenceName = "meeting_seq", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "meeting_seq")
     private Long id;
-
 
     @Column
     private Long startTime;
@@ -29,13 +31,18 @@ public class Meeting {
     @OneToOne
     private User author;
 
+    @OneToMany(mappedBy = "meeting", cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private List<Invitation> invitations;
+
     public Meeting() {}
 
-    public Meeting(Long startTime, Long duration, MeetingRoom meetingRoom, User author) {
+    public Meeting(Long startTime, Long duration, MeetingRoom meetingRoom, User author, List<Invitation> invitations) {
         this.startTime = startTime;
         this.duration = duration;
         this.meetingRoom = meetingRoom;
         this.author = author;
+        this.invitations = invitations;
     }
 
     public Long getId() {
@@ -76,5 +83,13 @@ public class Meeting {
 
     public void setAuthor(User author) {
         this.author = author;
+    }
+
+    public List<Invitation> getInvitations() {
+        return invitations;
+    }
+
+    public void setInvitations(List<Invitation> invitations) {
+        this.invitations = invitations;
     }
 }

@@ -1,21 +1,26 @@
 package ge.stsertsvadze.meetingroombooking.model.dto;
 
+import ge.stsertsvadze.meetingroombooking.model.entity.Invitation;
 import ge.stsertsvadze.meetingroombooking.model.entity.MeetingRoom;
 import ge.stsertsvadze.meetingroombooking.model.entity.User;
+
+import java.util.List;
 
 public class MeetingRequest {
     private Long startTime;
     private Long duration;
-    private MeetingRoom meetingRoom;
-    private User author;
+    private int roomNumber;
+    private String author;
+    private List<String> invitations;
 
     public MeetingRequest() {}
 
-    public MeetingRequest(Long startTime, Long duration, MeetingRoom meetingRoom, User author) {
+    public MeetingRequest(Long startTime, Long duration, int roomNumber, String author, List<String> invitations) {
         this.startTime = startTime;
         this.duration = duration;
-        this.meetingRoom = meetingRoom;
+        this.roomNumber = roomNumber;
         this.author = author;
+        this.invitations = invitations;
     }
 
     public Long getStartTime() {
@@ -34,19 +39,27 @@ public class MeetingRequest {
         this.duration = duration;
     }
 
-    public MeetingRoom getMeetingRoom() {
-        return meetingRoom;
+    public int getRoomNumber() {
+        return roomNumber;
     }
 
-    public void setMeetingRoom(MeetingRoom meetingRoom) {
-        this.meetingRoom = meetingRoom;
+    public void setMeetingRoom(int roomNumber) {
+        this.roomNumber = roomNumber;
     }
 
-    public User getAuthor() {
+    public String getAuthor() {
         return author;
     }
 
-    public void setAuthor(User author) {
+    public void setAuthor(String author) {
         this.author = author;
+    }
+
+    public List<String> getInvitations() {
+        return invitations;
+    }
+
+    public void setInvitations(List<String> invitations) {
+        this.invitations = invitations;
     }
 }

@@ -1,6 +1,7 @@
 package ge.stsertsvadze.meetingroombooking.controller;
 
 import ge.stsertsvadze.meetingroombooking.model.dto.*;
+import ge.stsertsvadze.meetingroombooking.model.entity.Invitation;
 import ge.stsertsvadze.meetingroombooking.model.entity.Meeting;
 import ge.stsertsvadze.meetingroombooking.model.entity.MeetingRoom;
 import ge.stsertsvadze.meetingroombooking.model.entity.User;
@@ -24,14 +25,9 @@ public class MeetingController {
 
     @PostMapping()
     public Response addMeeting(@RequestBody MeetingRequest meetingRequest) {
-        Long startTime = meetingRequest.getStartTime();
-        Long duration = meetingRequest.getDuration();
-        MeetingRoom meetingRoom = meetingRequest.getMeetingRoom();
-        User author = meetingRequest.getAuthor();
-        Meeting meeting = new Meeting(startTime, duration, meetingRoom, author);
-        boolean success = meetingService.addMeeting(meeting);
-        if (success) {
-            return new MeetingResponseSuccess(meeting);
+        Optional<Meeting> meeting = meetingService.addMeeting(meetingRequest);
+        if (meeting.isPresent()) {
+            return new MeetingResponseSuccess(meeting.get());
         } else {
             List<ErrorMessage> errors = Collections.singletonList(new ErrorMessage("invalid_meeting"));
             return new ResponseFailure(errors);
