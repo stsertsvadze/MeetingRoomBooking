@@ -24,7 +24,7 @@ public class UserController {
         User user = userRequest.getData();
         if (userService.userExists(user.getUsername())) {
             List<ErrorMessage> errors = Collections.singletonList(new ErrorMessage("username_taken"));
-            return new UserResponseFailure(errors);
+            return new ResponseFailure(errors);
         } else {
             userService.addUser(user);
             return new UserResponseSuccess(user);
@@ -39,7 +39,7 @@ public class UserController {
             return new UserResponseSuccess(result.get());
         } else {
             List<ErrorMessage> errors = Collections.singletonList(new ErrorMessage("wrong_credentials"));
-            return new UserResponseFailure(errors);
+            return new ResponseFailure(errors);
         }
     }
 }

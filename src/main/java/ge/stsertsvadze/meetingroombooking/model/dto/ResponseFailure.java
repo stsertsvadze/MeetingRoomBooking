@@ -2,10 +2,10 @@ package ge.stsertsvadze.meetingroombooking.model.dto;
 
 import java.util.List;
 
-public class UserResponseFailure implements Response {
+public class ResponseFailure implements Response {
     private List<ErrorMessage> errors;
 
-    public UserResponseFailure(List<ErrorMessage> errors) {
+    public ResponseFailure(List<ErrorMessage> errors) {
         this.errors = errors;
     }
 
