@@ -1,6 +1,6 @@
 package ge.stsertsvadze.meetingroombooking.model.dto.request;
 
-public class AnswerInvitationDto {
+public class AnswerInvitationDto extends ValidDto {
     private Long invitationId;
     private boolean accept;
 
@@ -25,5 +25,10 @@ public class AnswerInvitationDto {
 
     public void setAccept(boolean accept) {
         this.accept = accept;
+    }
+
+    @Override
+    public boolean isValid() {
+        return invitationId != null;
     }
 }

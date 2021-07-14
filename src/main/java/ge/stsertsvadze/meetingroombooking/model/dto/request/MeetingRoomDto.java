@@ -1,6 +1,6 @@
 package ge.stsertsvadze.meetingroombooking.model.dto.request;
 
-public class MeetingRoomDto {
+public class MeetingRoomDto extends ValidDto {
 
     private int roomNumber;
     private int capacity;
@@ -24,5 +24,10 @@ public class MeetingRoomDto {
 
     public void setCapacity(int capacity) {
         this.capacity = capacity;
+    }
+
+    @Override
+    boolean isValid() {
+        return roomNumber > 0 && capacity > 0;
     }
 }

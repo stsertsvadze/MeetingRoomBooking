@@ -30,6 +30,10 @@ public class InvitationController {
 
     @PostMapping()
     public Response invitePeople(@RequestBody Request<InvitationListDto> request, @RequestHeader String authorization) {
+        if (!request.isValid()) {
+            List<ErrorMessage> errors = Collections.singletonList(new ErrorMessage("invalid_request"));
+            return new ResponseFailure<>(errors);
+        }
         Optional<Meeting> meeting = invitationService.saveInvitations(request.getData(), authorization.substring(7));
         if (meeting.isPresent()) {
             return new ResponseSuccess<>(meeting);
@@ -41,6 +45,10 @@ public class InvitationController {
 
     @GetMapping
     public Response getInvitations(@RequestParam Long meetingId) {
+        if (meetingId <= 0) {
+            List<ErrorMessage> errors = Collections.singletonList(new ErrorMessage("invalid_request"));
+            return new ResponseFailure<>(errors);
+        }
         Optional<List<Invitation>> result = invitationService.getInvitations(meetingId);
         if (result.isPresent()) {
             return new ResponseSuccess<>(result.get());
@@ -52,6 +60,10 @@ public class InvitationController {
 
     @DeleteMapping
     public Response deleteInvitation(@RequestBody Request<DeleteInvitationDto> request, @RequestHeader String authorization) {
+        if (!request.isValid()) {
+            List<ErrorMessage> errors = Collections.singletonList(new ErrorMessage("invalid_request"));
+            return new ResponseFailure<>(errors);
+        }
         boolean success = invitationService.deleteInvitation(request.getData().getInvitationId(), authorization.substring(7));
         if (success) {
             return new ResponseSuccess<>("invitation_deleted");
@@ -63,6 +75,10 @@ public class InvitationController {
 
     @PutMapping
     public Response answerInvitation(@RequestBody Request<AnswerInvitationDto> request, @RequestHeader String authorization) {
+        if (!request.isValid()) {
+            List<ErrorMessage> errors = Collections.singletonList(new ErrorMessage("invalid_request"));
+            return new ResponseFailure<>(errors);
+        }
         Optional<Invitation> invitation = invitationService.answerInvitation(request.getData(), authorization.substring(7));
         if (invitation.isPresent()) {
             return new ResponseSuccess<>(invitation.get());

@@ -6,7 +6,7 @@ import ge.stsertsvadze.meetingroombooking.model.entity.User;
 
 import java.util.List;
 
-public class MeetingDto {
+public class MeetingDto extends ValidDto {
     private Long startTime;
     private Long duration;
     private int roomNumber;
@@ -61,5 +61,10 @@ public class MeetingDto {
 
     public void setInvitations(List<String> invitations) {
         this.invitations = invitations;
+    }
+
+    @Override
+    boolean isValid() {
+        return startTime != null && duration != null && roomNumber > 0 && author != null && invitations != null;
     }
 }

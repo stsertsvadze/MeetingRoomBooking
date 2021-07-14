@@ -2,6 +2,7 @@ package ge.stsertsvadze.meetingroombooking.controller;
 
 import ge.stsertsvadze.meetingroombooking.model.dto.*;
 import ge.stsertsvadze.meetingroombooking.model.dto.request.Request;
+import ge.stsertsvadze.meetingroombooking.model.dto.request.UserDto;
 import ge.stsertsvadze.meetingroombooking.model.dto.response.Response;
 import ge.stsertsvadze.meetingroombooking.model.dto.response.ResponseFailure;
 import ge.stsertsvadze.meetingroombooking.model.dto.response.ResponseSuccess;
@@ -24,12 +25,17 @@ public class UserController {
     }
 
     @PostMapping("/user")
-    public Response registerUser(@RequestBody Request<User> request) {
-        User user = request.getData();
-        if (userService.userExists(user.getUsername())) {
+    public Response registerUser(@RequestBody Request<UserDto> request) {
+        if (!request.isValid()) {
+            List<ErrorMessage> errors = Collections.singletonList(new ErrorMessage("invalid_request"));
+            return new ResponseFailure<>(errors);
+        }
+        UserDto userDto = request.getData();
+        if (userService.userExists(userDto.getUsername())) {
             List<ErrorMessage> errors = Collections.singletonList(new ErrorMessage("username_taken"));
             return new ResponseFailure<>(errors);
         } else {
+            User user = new User(userDto.getUsername(), userDto.getPassword(), userDto.getFullName());
             userService.addUser(user);
             return new ResponseSuccess<>(user);
         }
@@ -47,8 +53,13 @@ public class UserController {
     }
 
     @PostMapping("/session")
-    public Response login(@RequestBody Request<User> request) {
-        User user = request.getData();
+    public Response login(@RequestBody Request<UserDto> request) {
+        if (!request.isValid()) {
+            List<ErrorMessage> errors = Collections.singletonList(new ErrorMessage("invalid_request"));
+            return new ResponseFailure<>(errors);
+        }
+        UserDto userDto = request.getData();
+        User user = new User(userDto.getUsername(), userDto.getPassword(), userDto.getFullName());
         Optional<User> result = userService.getUserByCredentials(user);
         if (result.isPresent()) {
             return new ResponseSuccess<>(result.get());

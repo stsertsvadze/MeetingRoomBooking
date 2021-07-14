@@ -1,6 +1,6 @@
 package ge.stsertsvadze.meetingroombooking.model.dto.request;
 
-public class DeleteMeetingDto {
+public class DeleteMeetingDto extends ValidDto {
     private Long meetingId;
 
     public DeleteMeetingDto() {}
@@ -15,5 +15,10 @@ public class DeleteMeetingDto {
 
     public void setMeetingId(Long meetingId) {
         this.meetingId = meetingId;
+    }
+
+    @Override
+    boolean isValid() {
+        return meetingId != null;
     }
 }

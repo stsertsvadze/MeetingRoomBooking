@@ -2,7 +2,7 @@ package ge.stsertsvadze.meetingroombooking.model.dto.request;
 
 import java.util.List;
 
-public class InvitationListDto {
+public class InvitationListDto extends ValidDto {
     private Long meetingId;
     private List<String> invitations;
 
@@ -27,5 +27,10 @@ public class InvitationListDto {
 
     public void setInvitations(List<String> invitations) {
         this.invitations = invitations;
+    }
+
+    @Override
+    boolean isValid() {
+        return meetingId != null && invitations != null;
     }
 }

@@ -29,6 +29,10 @@ public class MeetingRoomController {
 
     @GetMapping()
     public Response getMeetingRoom(@RequestParam int roomNumber) {
+        if (roomNumber <= 0) {
+            List<ErrorMessage> errors = Collections.singletonList(new ErrorMessage("invalid_request"));
+            return new ResponseFailure<>(errors);
+        }
         Optional<MeetingRoom> meetingRoom = meetingRoomService.getMeetingRoom(roomNumber);
         if (meetingRoom.isPresent()) {
             return new ResponseSuccess<>(meetingRoom.get());
@@ -40,6 +44,10 @@ public class MeetingRoomController {
 
     @PostMapping()
     public Response addMeetingRoom(@RequestBody Request<MeetingRoomDto> request) {
+        if (!request.isValid()) {
+            List<ErrorMessage> errors = Collections.singletonList(new ErrorMessage("invalid_request"));
+            return new ResponseFailure<>(errors);
+        }
         MeetingRoomDto dto = request.getData();
         MeetingRoom meetingRoom = new MeetingRoom(dto.getRoomNumber(), dto.getCapacity());
         meetingRoomService.saveMeetingRoom(meetingRoom);
@@ -48,6 +56,10 @@ public class MeetingRoomController {
 
     @PutMapping()
     public Response updateMeetingRoom(@RequestBody Request<MeetingRoomDto> request) {
+        if (!request.isValid()) {
+            List<ErrorMessage> errors = Collections.singletonList(new ErrorMessage("invalid_request"));
+            return new ResponseFailure<>(errors);
+        }
         MeetingRoomDto dto = request.getData();
         MeetingRoom meetingRoom = new MeetingRoom(dto.getRoomNumber(), dto.getCapacity());
         meetingRoomService.saveMeetingRoom(meetingRoom);
@@ -56,6 +68,10 @@ public class MeetingRoomController {
 
     @DeleteMapping
     public Response deleteMeetingRoom(@RequestBody Request<DeleteRoomDto> request) {
+        if (!request.isValid()) {
+            List<ErrorMessage> errors = Collections.singletonList(new ErrorMessage("invalid_request"));
+            return new ResponseFailure<>(errors);
+        }
         boolean success = meetingRoomService.deleteMeetingRoom(request.getData().getRoomNumber());
         if (success) {
             return new ResponseSuccess<>("meeting_room_deleted");
