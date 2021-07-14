@@ -2,14 +2,18 @@ package ge.stsertsvadze.meetingroombooking.controller;
 
 import ge.stsertsvadze.meetingroombooking.model.dto.*;
 import ge.stsertsvadze.meetingroombooking.model.dto.request.Request;
+import ge.stsertsvadze.meetingroombooking.model.dto.request.SessionDto;
 import ge.stsertsvadze.meetingroombooking.model.dto.response.Response;
 import ge.stsertsvadze.meetingroombooking.model.dto.response.ResponseFailure;
 import ge.stsertsvadze.meetingroombooking.model.dto.response.ResponseSuccess;
 import ge.stsertsvadze.meetingroombooking.model.entity.User;
+import ge.stsertsvadze.meetingroombooking.security.JwtUtils;
 import ge.stsertsvadze.meetingroombooking.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import javax.swing.text.html.Option;
 import java.util.*;
 
 @RestController
@@ -32,6 +36,18 @@ public class UserController {
         } else {
             userService.addUser(user);
             return new ResponseSuccess<>(user);
+        }
+    }
+
+    @GetMapping("/session")
+    public Response getSession(@RequestBody Request<SessionDto> request) {
+        String auth = request.getData().getAuthorization();
+        Optional<User> user = userService.getSession(auth);
+        if (user.isPresent()) {
+            return new ResponseSuccess<>(user);
+        } else {
+            List<ErrorMessage> errors = Collections.singletonList(new ErrorMessage("invalid_token"));
+            return new ResponseFailure<>(errors);
         }
     }
 
