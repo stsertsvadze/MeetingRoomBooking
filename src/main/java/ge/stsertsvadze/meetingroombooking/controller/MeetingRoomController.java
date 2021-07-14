@@ -55,7 +55,7 @@ public class MeetingRoomController {
     }
 
     @DeleteMapping
-    public Response deleteMeetingRoom(@RequestParam Request<DeleteRoomDto> request) {
+    public Response deleteMeetingRoom(@RequestBody Request<DeleteRoomDto> request) {
         boolean success = meetingRoomService.deleteMeetingRoom(request.getData().getRoomNumber());
         if (success) {
             return new ResponseSuccess<>("meeting_room_deleted");
