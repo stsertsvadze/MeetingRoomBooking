@@ -8,6 +8,7 @@ import ge.stsertsvadze.meetingroombooking.model.entity.User;
 import ge.stsertsvadze.meetingroombooking.repository.MeetingRepository;
 import ge.stsertsvadze.meetingroombooking.repository.MeetingRoomRepository;
 import ge.stsertsvadze.meetingroombooking.repository.UserRepository;
+import ge.stsertsvadze.meetingroombooking.security.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,12 +19,14 @@ public class MeetingService {
     private final MeetingRepository meetingRepository;
     private final UserRepository userRepository;
     private final MeetingRoomRepository meetingRoomRepository;
+    private final JwtUtils jwtUtils;
 
     @Autowired
-    public MeetingService(MeetingRepository meetingRepository, UserRepository userRepository, MeetingRoomRepository meetingRoomRepository) {
+    public MeetingService(MeetingRepository meetingRepository, UserRepository userRepository, MeetingRoomRepository meetingRoomRepository, JwtUtils jwtUtils) {
         this.meetingRepository = meetingRepository;
         this.userRepository = userRepository;
         this.meetingRoomRepository = meetingRoomRepository;
+        this.jwtUtils = jwtUtils;
     }
 
     public Optional<Meeting> addMeeting(MeetingDto meetingDto) {
@@ -41,6 +44,9 @@ public class MeetingService {
         }
 
         if (meetingRoom.isPresent()) {
+            if (isAlreadyBooked(meetingRoom.get(), meetingDto.getStartTime(), meetingDto.getDuration())) {
+                return Optional.empty();
+            }
             meeting.setMeetingRoom(meetingRoom.get());
         } else {
             return Optional.empty();
@@ -53,11 +59,25 @@ public class MeetingService {
         return Optional.of(meeting);
     }
 
+    private boolean isAlreadyBooked(MeetingRoom meetingRoom, Long start, Long duration) {
+        long end = start + duration;
+        List<Meeting> meetings = meetingRepository.findAllByMeetingRoom(meetingRoom);
+        for (int i = 0; i < meetings.size(); i++) {
+            Meeting currMeeting = meetings.get(i);
+            Long currStart = currMeeting.getStartTime();
+            long currEnd = currMeeting.getStartTime() + currMeeting.getDuration();
+            if (!(start > currEnd || end < currStart)) return true; // two meetings have interception
+        }
+        return false;
+    }
+
     private List<Invitation> createInvitations(List<String> usernames, Meeting meeting) {
         List<Invitation> invitations = new ArrayList<>();
         HashSet<String> invited = new HashSet<>();
-        for (int i = 0; i < meeting.getInvitations().size(); i++) {
-            invited.add(meeting.getInvitations().get(i).getUser().getUsername());
+        if (meeting.getInvitations() != null) {
+            for (int i = 0; i < meeting.getInvitations().size(); i++) {
+                invited.add(meeting.getInvitations().get(i).getUser().getUsername());
+            }
         }
         for (int i = 0; i < usernames.size(); i++) {
             String username = usernames.get(i);
@@ -72,13 +92,19 @@ public class MeetingService {
         return invitations;
     }
 
-    public boolean deleteMeeting(Long meetingId) {
+    public boolean deleteMeeting(Long meetingId, String auth) {
         try {
-            meetingRepository.deleteById(meetingId);
+            Optional<Meeting> meeting = meetingRepository.findById(meetingId);
+            if (meeting.isPresent()) {
+                if (auth != null && jwtUtils.validateToken(auth, meeting.get().getAuthor())) {
+                    meetingRepository.deleteById(meetingId);
+                    return true;
+                }
+            }
         } catch (Exception e) {
             return false;
         }
-        return true;
+        return false;
     }
 
     public Optional<Meeting> getMeeting(Long meetingId) {

@@ -29,12 +29,12 @@ public class InvitationController {
     }
 
     @PostMapping()
-    public Response invitePeople(@RequestBody Request<InvitationListDto> request) {
-        Optional<Meeting> meeting = invitationService.saveInvitations(request.getData());
+    public Response invitePeople(@RequestBody Request<InvitationListDto> request, @RequestHeader String authorization) {
+        Optional<Meeting> meeting = invitationService.saveInvitations(request.getData(), authorization.substring(7));
         if (meeting.isPresent()) {
             return new ResponseSuccess<>(meeting);
         } else {
-            List<ErrorMessage> errors = Collections.singletonList(new ErrorMessage("invalid_meeting_id"));
+            List<ErrorMessage> errors = Collections.singletonList(new ErrorMessage("invalid_invitation"));
             return new ResponseFailure<>(errors);
         }
     }
@@ -51,23 +51,23 @@ public class InvitationController {
     }
 
     @DeleteMapping
-    public Response deleteInvitation(@RequestBody Request<DeleteInvitationDto> request) {
-        boolean success = invitationService.deleteInvitation(request.getData().getInvitationId());
+    public Response deleteInvitation(@RequestBody Request<DeleteInvitationDto> request, @RequestHeader String authorization) {
+        boolean success = invitationService.deleteInvitation(request.getData().getInvitationId(), authorization.substring(7));
         if (success) {
             return new ResponseSuccess<>("invitation_deleted");
         } else {
-            List<ErrorMessage> errors = Collections.singletonList(new ErrorMessage("invalid_invitation_id"));
+            List<ErrorMessage> errors = Collections.singletonList(new ErrorMessage("invalid_invitation"));
             return new ResponseFailure<>(errors);
         }
     }
 
     @PutMapping
-    public Response answerInvitation(@RequestBody Request<AnswerInvitationDto> request) {
-        Optional<Invitation> invitation = invitationService.answerInvitation(request.getData());
+    public Response answerInvitation(@RequestBody Request<AnswerInvitationDto> request, @RequestHeader String authorization) {
+        Optional<Invitation> invitation = invitationService.answerInvitation(request.getData(), authorization.substring(7));
         if (invitation.isPresent()) {
             return new ResponseSuccess<>(invitation.get());
         } else {
-            List<ErrorMessage> errors = Collections.singletonList(new ErrorMessage("invalid_invitation_id"));
+            List<ErrorMessage> errors = Collections.singletonList(new ErrorMessage("invalid_invitation"));
             return new ResponseFailure<>(errors);
         }
     }

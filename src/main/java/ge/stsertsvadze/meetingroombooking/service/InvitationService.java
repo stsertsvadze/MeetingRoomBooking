@@ -8,6 +8,8 @@ import ge.stsertsvadze.meetingroombooking.model.entity.User;
 import ge.stsertsvadze.meetingroombooking.repository.InvitationRepository;
 import ge.stsertsvadze.meetingroombooking.repository.MeetingRepository;
 import ge.stsertsvadze.meetingroombooking.repository.UserRepository;
+import ge.stsertsvadze.meetingroombooking.security.JwtUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -19,17 +21,23 @@ public class InvitationService {
     private final InvitationRepository invitationRepository;
     private final MeetingRepository meetingRepository;
     private final UserRepository userRepository;
+    private final JwtUtils jwtUtils;
 
-    public InvitationService(InvitationRepository invitationRepository, MeetingRepository meetingRepository, UserRepository userRepository) {
+    @Autowired
+    public InvitationService(InvitationRepository invitationRepository, MeetingRepository meetingRepository, UserRepository userRepository, JwtUtils jwtUtils) {
         this.invitationRepository = invitationRepository;
         this.meetingRepository = meetingRepository;
         this.userRepository = userRepository;
+        this.jwtUtils = jwtUtils;
     }
 
-    public Optional<Meeting> saveInvitations(InvitationListDto invitationListDto) {
+    public Optional<Meeting> saveInvitations(InvitationListDto invitationListDto, String auth) {
         Long meetingId = invitationListDto.getMeetingId();
         Optional<Meeting> meeting = meetingRepository.findById(meetingId);
         if (meeting.isPresent()) {
+            if (auth == null || !jwtUtils.validateToken(auth, meeting.get().getAuthor())) {
+                return Optional.empty();
+            }
             addInvitations(meeting.get(), invitationListDto.getInvitations());
             meetingRepository.save(meeting.get());
         }
@@ -58,21 +66,29 @@ public class InvitationService {
         return meeting.map(Meeting::getInvitations);
     }
 
-    public boolean deleteInvitation(Long invitationId) {
+    public boolean deleteInvitation(Long invitationId, String auth) {
         try {
-            invitationRepository.deleteById(invitationId);
-        } catch (Exception e) {
-            return false;
-        }
-        return true;
+            Optional<Invitation> invitation = invitationRepository.findById(invitationId);
+            if (invitation.isPresent()) {
+                if (auth != null && jwtUtils.validateToken(auth, invitation.get().getMeeting().getAuthor())) {
+                    invitationRepository.deleteById(invitationId);
+                    return true;
+                }
+            }
+        } catch (Exception ignored) {}
+        return false;
     }
 
-    public Optional<Invitation> answerInvitation(AnswerInvitationDto request) {
+    public Optional<Invitation> answerInvitation(AnswerInvitationDto request, String auth) {
         Long invitationId = request.getInvitationId();
         Invitation.Status choice = request.isAccept() ? Invitation.Status.ACCEPTED : Invitation.Status.DECLINED;
         Optional<Invitation> invitation = invitationRepository.findById(invitationId);
         if (invitation.isPresent()) {
+            if (auth == null || !jwtUtils.validateToken(auth, invitation.get().getUser())) {
+                return Optional.empty();
+            }
             invitation.get().setStatus(choice);
+            invitation.get().getUser().setJwt(auth);
             invitationRepository.save(invitation.get());
         }
         return invitation;

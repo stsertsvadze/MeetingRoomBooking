@@ -32,15 +32,16 @@ public class MeetingController {
         if (meeting.isPresent()) {
             return new ResponseSuccess<>(meeting.get());
         } else {
-            List<ErrorMessage> errors = Collections.singletonList(new ErrorMessage("invalid_meeting_id"));
+            List<ErrorMessage> errors = Collections.singletonList(new ErrorMessage("invalid_meeting"));
             return new ResponseFailure<>(errors);
         }
     }
 
     @PostMapping()
-    public Response addMeeting(@RequestBody Request<MeetingDto> request) {
+    public Response addMeeting(@RequestBody Request<MeetingDto> request, @RequestHeader String authorization) {
         Optional<Meeting> meeting = meetingService.addMeeting(request.getData());
         if (meeting.isPresent()) {
+            meeting.get().getAuthor().setJwt(authorization.substring(7));
             return new ResponseSuccess<>(meeting.get());
         } else {
             List<ErrorMessage> errors = Collections.singletonList(new ErrorMessage("invalid_meeting"));
@@ -49,8 +50,8 @@ public class MeetingController {
     }
 
     @DeleteMapping
-    public Response deleteMeeting(@RequestParam Request<DeleteMeetingDto> request) {
-        boolean success = meetingService.deleteMeeting(request.getData().getMeetingId());
+    public Response deleteMeeting(@RequestBody Request<DeleteMeetingDto> request, @RequestHeader String authorization) {
+        boolean success = meetingService.deleteMeeting(request.getData().getMeetingId(), authorization.substring(7));
         if (success) {
             return new ResponseSuccess<>("meeting_deleted");
         } else {
